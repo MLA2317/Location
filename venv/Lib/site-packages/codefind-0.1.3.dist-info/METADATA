@@ -1,0 +1,12 @@
+Metadata-Version: 2.1
+Name: codefind
+Version: 0.1.3
+Summary: Find code objects and their referents
+License: MIT
+Author: Olivier Breuleux
+Author-email: breuleux@gmail.com
+Requires-Python: >=3.8,<4.0
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9

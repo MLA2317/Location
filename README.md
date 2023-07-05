@@ -8,3 +8,10 @@
 6. install Postgres and PostGis program
 7. Create Postgres database
 8. append to setting DATABASE -  'ENGINE': 'django.contrib.gis.db.backends.postgis',
+
+
+![Screenshot (502)](https://github.com/MLA2317/Location/assets/102922781/91e21778-2d3e-4ccd-8d79-4295ee92ecb3)
+
+
+![Screenshot (503)](https://github.com/MLA2317/Location/assets/102922781/53b26952-ee0f-4b4d-a33a-d7af95470716)
+

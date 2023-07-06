@@ -56,6 +56,20 @@ class LocationGeo(geo.Model):
     def __str__(self):
         return f"Location {self.id}"
 
+    def get_google_map_url(self):
+        latitude = self.point.y
+        longitude = self.point.x
+        url = f"https://www.google.com/maps?q={latitude},{longitude}"
+        return url
+
+
+# class City(models.Model):
+#     name = models.CharField(max_length=100)
+#     lat = models.FloatField(null=True)
+#     long = models.FloatField(null=True)
+#
+#     def __str__(self):
+#         return self.name
 
 # def create_user_profile(sender, instance, created, **kwargs):
 #     if created:

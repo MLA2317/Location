@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-7qxr03qdw6(6z3h9^fq!+3m+^hv$d6%$1p*f!(y-e(@+q9l_#s
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -40,7 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.gis',
     'location',
+    'drf_yasg',
+    'rest_framework',
+
 ]
+
+AUTH_USER_MODEL = 'location.Location'
 
 GDAL_LIBRARY_PATH = r'C:\Users\user\Desktop\Location Api\venv\Lib\site-packages\osgeo\gdal304.dll'
 # GEOS_LIBRARY_PATh = r'\Users\user\Desktop\Location Api\venv\Lib\site-packages\osgeo\_gdalconst.cp39-win_amd64.pyd'
@@ -83,10 +88,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': 'location',
-        'USER': 'locationuser',
-        'PASSWORD': 'location1234',
+        'USER': 'usermap',
+        'PASSWORD': '4321',
         'HOST': 'localhost',
-        'PORT': 5432,
+        'PORT': '5432',
     }
 }
 

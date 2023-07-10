@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.gis import admin, forms
 from django.contrib.gis.db import models
-from .models import Location, LocationGeo
+from .models import Location, LocationGeo, City
 from .forms import AccountChangeForm
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.gis import admin
@@ -28,7 +28,7 @@ class LocationGeoAdmin(admin.OSMGeoAdmin):
     formfield_overrides = {
         models.PointField: {"widget": GoogleMapPointWidget},
     }
-    list_display = ('id', 'point')
+    list_display = ('id', 'location', 'point')
 
 
 admin.site.register(LocationGeo, LocationGeoAdmin)
@@ -39,13 +39,12 @@ class LocationAdmin(UserAdmin):
     add_fields = (
         (None, {'classes': ('wide',), 'fields': ('username', 'password', 'password2',)}),
     )
-    list_display = ('id', 'username', 'city', 'lat', 'long', 'is_superuser',
-                    'is_staff', 'is_active', 'created_date')
+    list_display = ('id', 'username', 'is_superuser', 'is_staff', 'is_active', 'created_date')
     ordering = None
     readonly_fields = ('created_date', )
     list_filter = ('created_date', 'is_superuser', 'is_staff', 'is_active')
     fieldsets = (
-        (None, {'fields': ('username', 'city', 'lat', 'long', 'password')}),
+        (None, {'fields': ('username', 'password')}),
         ('Permissions', {'fields': ('is_superuser', 'is_staff', 'is_active', 'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('created_date',)}),
     )
@@ -53,3 +52,10 @@ class LocationAdmin(UserAdmin):
 
 
 admin.site.register(Location, LocationAdmin)
+
+
+class CityAdmin(admin.ModelAdmin):
+    list_display = ['id', 'title', 'location_geo']
+
+
+admin.site.register(City, CityAdmin)

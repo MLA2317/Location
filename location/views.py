@@ -1,11 +1,13 @@
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import Distance
 from django.shortcuts import render
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from rest_framework import generics, status, views
 from rest_framework.response import Response
-from .models import Location
-from .serializer import RegisterSerializer, LoginSerializer, LocationSerializer, ClosestPeopleSerializer
+from .models import Location, City
+from .serializer import RegisterSerializer, LoginSerializer, LocationSerializer, CitySerializer
 
 
 class RegisterCreateAPI(generics.GenericAPIView):
@@ -29,22 +31,31 @@ class LoginCreateApi(generics.GenericAPIView):
 
 
 class ClosestPeopleView(views.APIView):
+    serializer_class = LocationSerializer
+
     @swagger_auto_schema(
         operation_description="Get closest people",
         responses={200: LocationSerializer(many=True)},
+        manual_parameters=[
+            openapi.Parameter(
+                name='city_id',
+                in_=openapi.IN_PATH,
+                description='Location ID',
+                type=openapi.TYPE_INTEGER,
+            ),
+        ]
     )
-    def get(self, request, location_id):
-        try:
-            location = Location.objects.get(id=location_id)
-        except Location.DoesNotExist:
-            return Response({'error': 'Location not found'}, status=404)
+    def get_closest_people(self, obj):
+        location_geo = obj.location_geo
+        closest_locations = Location.objects.exclude(id=location_geo.location.id).annotate(
+            distance=Distance('geo__point', location_geo.point)
+        ).order_by('distance')[:5]
+        serializer = LocationSerializer(closest_locations, many=True)
+        return serializer.data
 
-        serializer = LocationSerializer(location)
-        return Response(serializer.data)
-
-
-
-
+    class Meta:
+        model = City
+        fields = ['id', 'title', 'closest_people']
 
 # class SearchLocationCreateApi(generics.ListCreateAPIView):
 #     serializer_class = SearchSerializer

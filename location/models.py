@@ -33,9 +33,6 @@ class AccountManager(BaseUserManager):
 
 class Location(AbstractUser, PermissionsMixin):
     username = models.CharField(max_length=50, unique=True, verbose_name='Username', db_index=True)
-    city = models.CharField(max_length=221)
-    lat = models.FloatField(null=True)
-    long = models.FloatField(null=True)
     is_superuser = models.BooleanField(default=False, verbose_name='Super user')
     is_active = models.BooleanField(default=False, verbose_name='Active user')
     is_staff = models.BooleanField(default=True, verbose_name='Staff user')
@@ -51,6 +48,7 @@ class Location(AbstractUser, PermissionsMixin):
 
 
 class LocationGeo(geo.Model):
+    location = models.ForeignKey('Location', on_delete=models.CASCADE, related_name='geo')
     point = geo.PointField()
 
     def __str__(self):
@@ -61,6 +59,18 @@ class LocationGeo(geo.Model):
         longitude = self.point.x
         url = f"https://www.google.com/maps?q={latitude},{longitude}"
         return url
+
+    class Meta:
+        verbose_name_plural = 'Location Geos'
+
+
+class City(models.Model):
+    title = models.CharField(max_length=221)
+    location_geo = models.ForeignKey('LocationGeo', on_delete=models.CASCADE, related_name='locat_geo')
+
+    def __str__(self):
+        return f"{self.title} of {self.location_geo}"
+
 
 
 # class City(models.Model):

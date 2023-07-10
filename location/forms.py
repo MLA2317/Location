@@ -9,7 +9,7 @@ class AccountCreationForm(forms.ModelForm):
 
     class Meta:
         model = Location
-        fields = ('username', 'city', 'lat', 'long')
+        fields = ('username',)
 
     def clean_password2(self): #validata yani password 1 va 2 ni tekshiradi
         password = self.cleaned_data.get('password1')
@@ -32,7 +32,7 @@ class AccountCreationForm(forms.ModelForm):
 class AccountChangeForm(forms.ModelForm):
     class Meta:
         model = Location
-        fields = ('username', 'city', 'lat', 'long', 'is_superuser', 'is_staff', 'is_active')
+        fields = ('username', 'is_superuser', 'is_staff', 'is_active')
 
     def __init__(self, *args, **kwargs):
         super(AccountChangeForm, self).__init__(*args, **kwargs) # bu admin panelda change password chiqadi

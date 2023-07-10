@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Location, LocationGeo
+from .models import Location, LocationGeo, City
 from django.contrib.gis.geos import Point
 from django.contrib.gis.measure import Distance
 
@@ -10,7 +10,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ['username', 'password', 'password2', 'city', 'lat', 'long', 'created_date']
+        fields = ['username', 'password', 'password2', 'created_date']
 
     def validate(self, attrs):
         password = attrs.get('password')
@@ -42,28 +42,53 @@ class LoginSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class ClosestPeopleSerializer(serializers.ModelSerializer):
+class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
-        fields = ['id', 'username', 'city', 'lat', 'long']
+        fields = ['id', 'username']
 
 
-class LocationSerializer(serializers.ModelSerializer):
+class CitySerializer(serializers.ModelSerializer):
     closest_people = serializers.SerializerMethodField()
 
     def get_closest_people(self, obj):
-        radius = 1000
-        points = Point(obj.long, obj.lat)
-        closest_locations = Location.objects.exclude(id=obj.id).annotate(distance=Distance('point', points)).order_by('distance')[:5]
-        serializer = ClosestPeopleSerializer(closest_locations, many=True)
+        closest_locations = Location.objects.filter(geo__distance_lte=(obj.location_geo.point, 1000)).exclude(id=obj.location_geo.location.id)
+        serializer = LocationSerializer(closest_locations, many=True)
         return serializer.data
 
     class Meta:
-        model = Location
-        fields = ['id', 'username', 'city', 'lat', 'long', 'closest_people']
+        model = City
+        fields = ['id', 'title', 'closest_people']
 
 
 
+# class ClosestPeopleSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Location
+#         fields = ['id', 'username']
+#
+#
+# class LocationSerializer(serializers.ModelSerializer):
+#     closest_people = serializers.SerializerMethodField()
+#
+#     def get_closest_people(self, obj):
+#         try:
+#             city_id = self.context['request'].parser_context['kwargs']['city_id']
+#             location = Location.objects.get(id=city_id)
+#         except (KeyError, Location.DoesNotExist):
+#             return []
+#
+#         radius = 1000
+#         points = location.geo.values_list('point', flat=True)
+#         closest_locations = Location.objects.exclude(id=location.id).annotate(
+#             distance=Distance('geo__point', points[0])
+#         ).order_by('distance')[:5]
+#         serializer = ClosestPeopleSerializer(closest_locations, many=True)
+#         return serializer.data
+#
+#     class Meta:
+#         model = Location
+#         fields = ['id', 'username', 'closest_people']
 
 
 # class ClosestPeopleSerializer(serializers.ModelSerializer):

@@ -1,11 +1,11 @@
 from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.db.models.functions import Distance
-from django.contrib.gis.measure import Distance
-from django.contrib.gis.geos import Point
 
 from django.shortcuts import render
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import Distance
+from django.contrib.gis.geos import Point
 from rest_framework import generics, status, views
 from rest_framework.response import Response
 from .models import Location, City
@@ -30,32 +30,6 @@ class LoginCreateApi(generics.GenericAPIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'success': True, 'message': 'Successfully log in'}, status=status.HTTP_201_CREATED)
-
-
-# class LocationView(views.APIView):
-#     def post(self, request):
-#         serializer = CitySerializer(data=request.data)
-#         if serializer.is_valid():
-#             lat = serializer.validated_data['lat']
-#             long = serializer.validated_data['long']
-#
-#             point = Point(long, lat, srid=4326)
-#
-#             cities = City.objects.annotate(distance=Distance('location', point)).order_by('distance')[:5]
-#
-#             city_data = []
-#             for city in cities:
-#                 print('city', city)
-#                 city_data.append({
-#                     'id': city.id,
-#                     'name': city.title,
-#                     'distance': city.distance.km,
-#                 })
-#                 print('city_data', city_data)
-#
-#             return Response(city_data)
-#         else:
-#             return Response(serializer.errors, status=400)
 
 
 class LocationView(generics.CreateAPIView):
@@ -84,6 +58,8 @@ class LocationView(generics.CreateAPIView):
             return Response(city_data)
         else:
             return Response(serializer.errors, status=400)
+
+
 
 # class ClosestPeopleView(views.APIView):
 #     queryset = Location.objects.all()
@@ -136,4 +112,30 @@ class LocationView(generics.CreateAPIView):
 #                         'distance').filter(distance__lte=float(radius) * 1000))
 #                     return locat_dis
 
+
+
+# class LocationView(views.APIView):
+#     def post(self, request):
+#         serializer = CitySerializer(data=request.data)
+#         if serializer.is_valid():
+#             lat = serializer.validated_data['lat']
+#             long = serializer.validated_data['long']
+#
+#             point = Point(long, lat, srid=4326)
+#
+#             cities = City.objects.annotate(distance=Distance('location', point)).order_by('distance')[:5]
+#
+#             city_data = []
+#             for city in cities:
+#                 print('city', city)
+#                 city_data.append({
+#                     'id': city.id,
+#                     'name': city.title,
+#                     'distance': city.distance.km,
+#                 })
+#                 print('city_data', city_data)
+#
+#             return Response(city_data)
+#         else:
+#             return Response(serializer.errors, status=400)
 

@@ -42,23 +42,31 @@ class LoginSerializer(serializers.ModelSerializer):
         return attrs
 
 
-class LocationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Location
-        fields = ['id', 'username']
-
-
 class CitySerializer(serializers.ModelSerializer):
-    closest_people = serializers.SerializerMethodField()
-
-    def get_closest_people(self, obj):
-        closest_locations = Location.objects.filter(geo__distance_lte=(obj.location_geo.point, 1000)).exclude(id=obj.location_geo.location.id)
-        serializer = LocationSerializer(closest_locations, many=True)
-        return serializer.data
-
     class Meta:
         model = City
-        fields = ['id', 'title', 'closest_people']
+        fields = ['id', 'title', 'location_geo']
+
+
+
+# class LocationSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Location
+#         fields = ['id', 'username']
+
+
+#
+# class CitySerializer(serializers.ModelSerializer):
+#     closest_people = serializers.SerializerMethodField()
+#
+#     def get_closest_people(self, obj):
+#         closest_locations = Location.objects.filter(geo__distance_lte=(obj.location_geo.point, 1000)).exclude(id=obj.location_geo.location.id)
+#         serializer = LocationSerializer(closest_locations, many=True)
+#         return serializer.data
+#
+#     class Meta:
+#         model = City
+#         fields = ['id', 'title', 'get_closest_people']
 
 
 
@@ -89,14 +97,14 @@ class CitySerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Location
 #         fields = ['id', 'username', 'closest_people']
-
-
+#
+#
 # class ClosestPeopleSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = Location
 #         fields = ['lat', 'long']
 #
-#
+
 # class LocationSerializer(serializers.ModelSerializer):
 #     closest_people = serializers.SerializerMethodField()
 #
@@ -114,19 +122,17 @@ class CitySerializer(serializers.ModelSerializer):
 #
 #         serializer = ClosestPeopleSerializer(closest_locations, many=True)
 #         return serializer.data
-#
+# #
 #     class Meta:
 #         model = Location
 #         fields = ['id', 'latitude', 'longitude', 'closest_people']
 #
-#
 
-# class SearchSerializer(serializers.ModelSerializer):
+#
+# class SearchSerializer(serializers.ModelSerializer): # ishlamadi
 #     city = serializers.CharField(max_length=220)
 #     distance = serializers.DecimalField(source='distance.km', max_digits=10, decimal_places=2, required=False, read_only=True)
-#     lon = serializers.FloatField(required=True)
-#     lat = serializers.FloatField(required=True)
 #
 #     class Meta:
-#         model = Location
-#         fields = ('city', 'distance', 'lon', 'lat')
+#         model = LocationGeo
+#         fields = ('id', 'location', 'point', 'city', 'distance')

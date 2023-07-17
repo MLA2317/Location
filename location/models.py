@@ -73,6 +73,7 @@ class City(models.Model):
 
 
 
+
 # class City(models.Model):
 #     name = models.CharField(max_length=100)
 #     lat = models.FloatField(null=True)

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.gis import admin, forms
 from django.contrib.gis.db import models
-from .models import Location, LocationGeo, City, LocationCity
+from .models import Location, LocationGeo, City
 from .forms import AccountChangeForm
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.gis import admin
@@ -55,12 +55,12 @@ admin.site.register(Location, LocationAdmin)
 
 
 class CityAdmin(admin.ModelAdmin):
-    list_display = ['id', 'title']
+    list_display = ['id', 'title', 'location_geo']
 
 
-class LocationCityAdmin(admin.ModelAdmin):
-    list_display = ['id', 'city', 'location_geo']
-
+# class LocationCityAdmin(admin.ModelAdmin):
+#     list_display = ['id', 'city', 'location_geo']
+#
 
 admin.site.register(City, CityAdmin)
-admin.site.register(LocationCity, LocationCityAdmin)
+# admin.site.register(LocationCity, LocationCityAdmin)

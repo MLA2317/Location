@@ -6,10 +6,10 @@ from drf_yasg import openapi
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import Distance
 from django.contrib.gis.geos import Point
-from rest_framework import generics, status, views
+from rest_framework import generics, status, views, viewsets
 from rest_framework.response import Response
 from .models import Location, City
-from .serializer import RegisterSerializer, LoginSerializer, CitySerializer
+from .serializer import RegisterSerializer, LoginSerializer, CitySerializer, LocationSerializer
 
 
 class RegisterCreateAPI(generics.GenericAPIView):
@@ -32,33 +32,68 @@ class LoginCreateApi(generics.GenericAPIView):
         return Response({'success': True, 'message': 'Successfully log in'}, status=status.HTTP_201_CREATED)
 
 
-class LocationView(generics.CreateAPIView):
+class LocationViewSet(viewsets.ModelViewSet):
+    queryset = Location.objects.all()
+    # print('queryset', queryset)
+    serializer_class = LocationSerializer
+
+
+class CityViewSet(viewsets.ModelViewSet):
+    queryset = City.objects.all()
     serializer_class = CitySerializer
 
-    def create(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
-        if serializer.is_valid():
-            lat = serializer.validated_data.get('lat')
-            long = serializer.validated_data.get('long')
+    def get_nearest_cities(self, city):
+        if city.location_geo:
+            print('location', city.location_geo)
+            return City.objects.exclude(id=city.id).annotate(distance=Distance('location_geo__point', city.location_geo.point)).order_by('distance')[:5]
+        return City.objects.none()
 
-            point = Point(long, lat, srid=4326)
-            print('point', point)
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
-            cities = City.objects.annotate(distance=Distance('location_geo__point', point)).order_by('distance')[:5]
-            print('cities', cities)
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        print('instance', instance)
+        serializer = self.get_serializer(instance)
+        print('serializer', serializer)
+        nearest_cities = self.get_nearest_cities(instance)
+        nearest_cities_serializer = self.get_serializer(nearest_cities, many=True)
+        data = serializer.data
+        data['nearest_cities'] = nearest_cities_serializer.data
+        return Response(data)
 
-            city_data = []
-            for city in cities:
-                city_data.append({
-                    'id': city.id,
-                    'name': city.title,
-                    'distance': city.distance.km,
-                })
 
-            return Response(city_data)
-        else:
-            return Response(serializer.errors, status=400)
-
+# class LocationView(generics.CreateAPIView):
+#     serializer_class = LocationSerializer
+#
+#     def create(self, request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             lat = serializer.validated_data.get('lat')
+#             long = serializer.validated_data.get('long')
+#
+#             point = Point(long, lat, srid=4326)
+#             print('point', point)
+#
+#             cities = City.objects.annotate(distance=Distance('location_geo__point', point)).order_by('distance')[:5]
+#             print('cities', cities)
+#
+#             city_data = []
+#             for city in cities:
+#                 city_data.append({
+#                     'id': city.id,
+#                     'name': city.title,
+#                     'distance': city.distance.km,
+#                 })
+#
+#             return Response(city_data)
+#         else:
+#             return Response(serializer.errors, status=400)
+#
+# #
+#
 
 
 # class ClosestPeopleView(views.APIView):

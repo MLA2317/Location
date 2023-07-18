@@ -38,8 +38,24 @@ class LoginSerializer(serializers.ModelSerializer):
         password = attrs.get('password')
         if username != password:
             raise ValueError('Username or Password wrong!')
-
         return attrs
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    google_map_url = serializers.SerializerMethodField()
+
+    def get_google_map_url(self, instance):
+        if instance:
+            print('instance', instance)
+            latitude = instance.location_geo.point.y
+            longitude = instance.location_geo.point.x
+            url = f"https://www.google.com/maps?q={latitude},{longitude}"
+            return url
+        return ""
+
+    class Meta:
+        model = Location
+        fields = ('id', 'username', 'is_superuser', 'is_active', 'is_staff', 'created_date', 'google_map_url')
 
 
 class CitySerializer(serializers.ModelSerializer):

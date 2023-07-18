@@ -66,17 +66,19 @@ class LocationGeo(geo.Model):
 
 class City(models.Model):
     title = models.CharField(max_length=221)
+    location_geo = models.ForeignKey('LocationGeo', on_delete=models.CASCADE)
+
 
     def __str__(self):
-        return self.title
+        return f"{self.title} of {self.location_geo}"
 
 
-class LocationCity(models.Model):
-    city = models.ForeignKey('City', on_delete=models.CASCADE)
-    location_geo = models.ForeignKey('LocationGeo', on_delete=models.CASCADE, related_name='locat_geo')
-
-    def __str__(self):
-        return f"{self.city} of {self.location_geo}"
+# class LocationCity(models.Model):
+#     city = models.ForeignKey('City', on_delete=models.CASCADE)
+#     location_geo = models.ForeignKey('LocationGeo', on_delete=models.CASCADE, related_name='locat_geo')
+#
+#     def __str__(self):
+#         return f"{self.city} of {self.location_geo}"
 
 
 
